@@ -5,27 +5,25 @@
     android:background="@drawable/background"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="56dp"
-        android:layout_marginTop="24dp"
-        android:text="Click the Button"
-        android:textColor="@color/common_action_bar_splitter"
-         />
-
     <Button
         android:id="@+id/myLocBtn"
         android:layout_width="188dp"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/textView1"
-        android:layout_marginTop="38dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
         android:gravity="left|center_vertical"
-        android:text="ShowMyLocation"
-        android:textAlignment="viewStart"
-        
-         />
+        android:text="Show My Location"
+        android:textAlignment="viewStart" />
+
+    <Button
+        android:id="@+id/sendLocBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/myLocBtn"
+        android:layout_alignRight="@+id/myLocBtn"
+        android:layout_below="@+id/myLocBtn"
+        android:layout_marginTop="25dp"
+        android:text="Send my location" />
 
 </RelativeLayout>

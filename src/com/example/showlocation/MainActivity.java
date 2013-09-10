@@ -14,7 +14,7 @@ public class MainActivity extends Activity {
 
 	Button btnShowMyLocation;
 	GPSTracker gps;
-	
+	Button btnsendLocation;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -22,13 +22,16 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		btnShowMyLocation = (Button) findViewById(R.id.myLocBtn);
+		btnsendLocation= (Button) findViewById(R.id.sendLocBtn);
+		
+		gps=new GPSTracker(MainActivity.this);
 		
 		btnShowMyLocation.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				gps=new GPSTracker(MainActivity.this);
+				
 				
 				
 				if(gps.cangetLocation())
@@ -49,6 +52,33 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
+		
+		btnsendLocation.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+									
+				
+				if(gps.cangetLocation())
+				{
+					Double latitude=gps.getLatitude();
+					Double longitude=gps.getLongitude();
+							System.out.print(latitude);		
+					Intent intent=new Intent(MainActivity.this,LocationSender.class);
+					intent.putExtra("lati", latitude);
+					intent.putExtra("longi",longitude);
+					
+					startActivity(intent);
+										
+				}
+				else{
+					gps.showSettingsAlert();
+				}
+				
+			}
+		});
+		
 	}
 
 	@Override
