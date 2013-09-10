@@ -47,7 +47,8 @@ public class LocationSender extends Activity{
 		lat=Double.toString(getIntent().getExtras().getDouble("lati"));
 		lon=Double.toString(getIntent().getExtras().getDouble("longi"));
 		
-		System.out.println("lat  "+lat);
+		
+		
 		btnSend.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
@@ -60,7 +61,7 @@ public class LocationSender extends Activity{
 	}
 		class CreateNewLocation extends AsyncTask<String,String,String>
 		{
-
+			int success=0;
 			@Override
 			protected void onPreExecute() {
 		        super.onPreExecute();
@@ -83,7 +84,7 @@ public class LocationSender extends Activity{
 				params.add(new BasicNameValuePair("receiverID",receiver));
 				params.add(new BasicNameValuePair("lat",lat));
 				params.add(new BasicNameValuePair("lon",lon));
-				System.out.println("latitiude  "+lat);
+				
 				
 				// getting JSON Object
 	            // Note that create product url accepts POST method
@@ -94,11 +95,9 @@ public class LocationSender extends Activity{
 	            
 	         // check for success tag
 	            try {
-	                int success = json.getInt(TAG_SUCCESS);
-	                System.out .print("successsss   "+success);
-	                
-	                //Toast.makeText(getApplicationContext(),"Location is succesfully sent ",Toast.LENGTH_SHORT);
-	               
+	                 success = json.getInt(TAG_SUCCESS);
+	                          
+	                	               
 	            } catch (JSONException e) {
 	                e.printStackTrace();
 	            }
@@ -109,7 +108,14 @@ public class LocationSender extends Activity{
 			
 			 protected void onPostExecute(String file_url) {
 		            // dismiss the dialog once done
-		            pDialog.dismiss();
+				 if(success==1)
+				 {
+				 Toast.makeText(getApplicationContext(),"Location is succesfully sent ",Toast.LENGTH_SHORT).show();
+				 } 
+				 else{
+					 Toast.makeText(getApplicationContext(),"Error in sending location... ",Toast.LENGTH_SHORT).show();
+				 }
+				 pDialog.dismiss();
 		        }
 		 
 			
