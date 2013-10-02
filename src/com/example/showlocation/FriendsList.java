@@ -43,6 +43,7 @@ public class FriendsList extends ListActivity {
 		try {
 			Bundle gotbasket = getIntent().getExtras();
 			status = gotbasket.getString("stat");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -129,7 +130,17 @@ public class FriendsList extends ListActivity {
 			intent.putExtras(basket);
 			intent.putExtra("LocObj", LB);
 			startActivity(intent);
-		} else if (status.equals((String) "search")) {
+		} 
+		else if(status.equals((String)"request"))
+		{
+			String phoneNum = contactList.get(position).getPhoneNumber();
+			Bundle basket = new Bundle();
+			basket.putString("number", phoneNum);
+			Intent intent = new Intent(FriendsList.this, RequestLocation.class);
+			intent.putExtras(basket);
+			startActivity(intent);
+		}
+		else if (status.equals((String) "search")) {
 
 		}
 

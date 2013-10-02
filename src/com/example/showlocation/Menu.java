@@ -18,7 +18,7 @@ public class Menu extends ListActivity {
 
 	// List options strings
 	private String classes[] = { "Show My Location", "Send My Location",
-			"Friends", "Moving mode", "History", "My Info" };
+			"Friends", "Request location", "Moving mode", "History", "My Info" };
 	private GPSTracker gps;
 
 	@Override
@@ -118,6 +118,12 @@ public class Menu extends ListActivity {
 		} else if (position == 2) {
 			Intent i = new Intent(Menu.this, FriendsSettings.class);
 			startActivity(i);
+		} else if (position == 3) {
+			Intent i = new Intent(Menu.this, RequestLocation.class);
+			startActivity(i);
+		} else if (position == 5) {
+			Intent intent = new Intent(Menu.this, LocationList.class);
+			startActivity(intent);
 		}
 
 	}
@@ -140,7 +146,7 @@ public class Menu extends ListActivity {
 							intent.addCategory(Intent.CATEGORY_HOME);
 							intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 							startActivity(intent); // Close the application
-
+							finish();
 						}
 					});
 

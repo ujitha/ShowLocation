@@ -77,6 +77,19 @@
             android:name="com.example.showlocation.SMSreceiveOption"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.DeviceDefault" />
+         <activity
+            android:name="com.example.showlocation.LocationList"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.DeviceDefault" />
+          <activity
+            android:name="com.example.showlocation.RequestLocation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.DeviceDefault" />
+          <activity
+            android:name="com.example.showlocation.RequestOption"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.DeviceDefault" />
+         
 
         <receiver android:name=".SMSReceiver" >
             <intent-filter android:priority="999">

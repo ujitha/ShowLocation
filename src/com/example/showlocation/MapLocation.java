@@ -41,6 +41,7 @@ public class MapLocation extends Activity {
 		LocationObj LBObj=(LocationObj) getIntent().getSerializableExtra("LocObj");
 		String numLat=LBObj.getLatitude();
 		String numLon=LBObj.getLongitude();
+		String sender=LBObj.getSender();
 		
 		latitude =Double.parseDouble(numLat);
 		longitude=Double.parseDouble(numLon);
@@ -59,7 +60,7 @@ public class MapLocation extends Activity {
 		map.animateCamera(CameraUpdateFactory.newLatLngZoom(mycod, 15.0f));
 		map.setMyLocationEnabled(true);
 		MarkerOptions MP = new MarkerOptions().position(mycod)
-				.title("I'm here");
+				.title(sender);
 		map.addMarker(MP);
 
 	};

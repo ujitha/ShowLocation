@@ -3,6 +3,7 @@ import java.io.Serializable;;
 
 public class LocationObj implements Serializable{
 
+	private int id;
 	private String sender;
 	private String Latitude;
 	private String Longitude;
@@ -16,6 +17,14 @@ public class LocationObj implements Serializable{
 		Date=null;
 	}
 	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public LocationObj(String sender,String lat,String lon,String date)
 	{
 		this.Date=date;

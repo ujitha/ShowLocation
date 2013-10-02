@@ -3,6 +3,7 @@ package com.example.showlocation;
 import java.util.StringTokenizer;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -50,6 +51,18 @@ public class SMSReceiver extends BroadcastReceiver {
 						context.startActivity(i);
 
 					}
+					else if(Msg.startsWith("#locationfinder#"))
+					{
+						Bundle basket = new Bundle();
+						basket.putString("phoneNumber", phoneNumber);
+						Intent i = new Intent(context, RequestOption.class);
+						i.putExtras(basket);
+
+						i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						context.startActivity(i);
+					}
+					
+					
 				}
 
 			} catch (Exception e) {
