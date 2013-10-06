@@ -89,6 +89,10 @@
             android:name="com.example.showlocation.RequestOption"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.DeviceDefault" />
+           <activity
+            android:name="com.example.showlocation.MovingmodeOption"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.DeviceDefault" />
          
 
         <receiver android:name=".SMSReceiver" >

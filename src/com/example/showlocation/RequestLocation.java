@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -171,6 +172,19 @@ public class RequestLocation extends Activity {
 
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNo, null, msg, sentPI, deliveredPI);
+	}
+	
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		
+		if (keyCode == KeyEvent.KEYCODE_BACK) 
+		{
+			Intent i=new Intent(RequestLocation.this,Menu.class);
+			startActivity(i);
+		}
+		
+		return super.onKeyDown(keyCode, event);
 	}
 
 }

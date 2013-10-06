@@ -96,6 +96,7 @@ public class RequestOption extends Activity {
 				intent.addCategory(Intent.CATEGORY_HOME);
 				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(intent); // Close the application
+				finish();
 				
 			}
 		});

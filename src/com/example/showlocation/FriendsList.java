@@ -140,6 +140,15 @@ public class FriendsList extends ListActivity {
 			intent.putExtras(basket);
 			startActivity(intent);
 		}
+		else if(status.equals((String)"moveMode"))
+		{
+			String phoneNum = contactList.get(position).getPhoneNumber();
+			Bundle basket = new Bundle();
+			basket.putString("number", phoneNum);
+			Intent intent = new Intent(FriendsList.this, MovingmodeOption.class);
+			intent.putExtras(basket);
+			startActivity(intent);
+		}
 		else if (status.equals((String) "search")) {
 
 		}

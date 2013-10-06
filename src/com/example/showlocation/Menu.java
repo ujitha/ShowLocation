@@ -121,7 +121,12 @@ public class Menu extends ListActivity {
 		} else if (position == 3) {
 			Intent i = new Intent(Menu.this, RequestLocation.class);
 			startActivity(i);
-		} else if (position == 5) {
+		}else if(position==4)
+		{
+			Intent intent = new Intent(Menu.this,MovingmodeOption.class);
+			startActivity(intent);
+		}
+		else if (position == 5) {
 			Intent intent = new Intent(Menu.this, LocationList.class);
 			startActivity(intent);
 		}
@@ -146,7 +151,7 @@ public class Menu extends ListActivity {
 							intent.addCategory(Intent.CATEGORY_HOME);
 							intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 							startActivity(intent); // Close the application
-							finish();
+							
 						}
 					});
 
