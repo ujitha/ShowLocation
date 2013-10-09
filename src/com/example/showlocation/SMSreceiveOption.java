@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 
 public class SMSreceiveOption extends Activity {
 
@@ -30,19 +31,18 @@ public class SMSreceiveOption extends Activity {
 		String smlon = st.nextToken();
 		final String longitude = smlon.substring(4);
 		final String date = st.nextToken();
-		
-		final String phoneNumber="0"+Number.substring(3);
-		String sender =phoneNumber;
-		
-		if(db.checkContact(sender))
-		{
-			sender=db.getContact(phoneNumber).getName();
+
+		final String phoneNumber = "0" + Number.substring(3);
+		String sender = phoneNumber;
+
+		if (db.checkContact(sender)) {
+			sender = db.getContact(phoneNumber).getName();
 		}
-		
+
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 		alert.setTitle("New Location received");
-		alert.setMessage("New Location received from "+sender);
+		alert.setMessage("New Location received from " + sender);
 
 		alert.setPositiveButton("Show", new DialogInterface.OnClickListener() {
 
@@ -71,19 +71,34 @@ public class SMSreceiveOption extends Activity {
 						longitude, date);
 
 				db.addLocation(loc);
-				
+
 				Intent intent = new Intent(Intent.ACTION_MAIN);
 				intent.addCategory(Intent.CATEGORY_HOME);
 				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(intent); // Close the application
-				dialog.cancel();
 				finish();
+				dialog.cancel();
+
 			}
 		});
 
 		AlertDialog al = alert.create();
 		al.show();
 
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+			Intent intent = new Intent(Intent.ACTION_MAIN);
+			intent.addCategory(Intent.CATEGORY_HOME);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			startActivity(intent); // Close the application
+
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 
 }

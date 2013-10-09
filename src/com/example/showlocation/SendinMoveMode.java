@@ -3,132 +3,114 @@ package com.example.showlocation;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.example.showlocation.SMShandler.CreateNewMessage;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.app.AlertDialog.Builder;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.telephony.SmsManager;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-public class RequestOption extends Activity {
+public class SendinMoveMode extends Service {
 
-	Databasehandler db;
-	private ProgressDialog pDialog;
-
-	TextView sendOpt;
-	TextView toTV;
-	Button btnIgn;
-	Button btnSend;
-	EditText receiption;
+	private boolean isRunning;
 	String Number;
-	GPSTracker gps;
+	Double period;
+	int count;
+	private GPSTracker gps;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
-		setContentView(R.layout.sender_layout);
-		
-		db = new Databasehandler(this);
-		
-		
+	public IBinder onBind(Intent arg0) {
 
-		Bundle gotBasket = getIntent().getExtras();
-		Number = gotBasket.getString("phoneNumber");
+		return null;
+	}
 
-		sendOpt = (TextView) findViewById(R.id.sendwayTV);
-		btnSend = (Button) findViewById(R.id.searchBtn);
-		btnIgn = (Button) findViewById(R.id.sendBtn);
-		receiption = (EditText) findViewById(R.id.receiverIDET);
-		toTV=(TextView) findViewById(R.id.tvTO);
-
-		receiption.setEnabled(false);
-		String Num="0"+Number.substring(3);
-		String sender=Num;
-		
-		if(db.checkContact(Num))
-		{
-			sender=db.getContact(Num).getName();
-		}
-		
-		sendOpt.setText("New location request from " + sender +"\n"
-				+ " Send location or not ?");
-		btnSend.setText("Send");
-		btnIgn.setText("Ignore");
-		toTV.setText("");
-
-		btnSend.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View arg0) {
-				
-				gps = new GPSTracker(RequestOption.this);
-				if (gps.cangetLocation()) {
-					new CreateNewMessage().execute();
-				} else {
-					gps.showSettingsAlert();
-					
-				}
-
-			}
-		});
-		
-		btnIgn.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View arg0) {
-				Intent intent = new Intent(Intent.ACTION_MAIN);
-				intent.addCategory(Intent.CATEGORY_HOME);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(intent); // Close the application
-				finish();
-				
-			}
-		});
+	@Override
+	public void onCreate() {
+		// TODO Auto-generated method stub
+		super.onCreate();
 
 	}
 
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+
+		isRunning = true;
+		gps = new GPSTracker(this);
+
+		String Msg = intent.getStringExtra("Msg");
+		Number = intent.getStringExtra("phoneNumber");
+		StringTokenizer st = new StringTokenizer(Msg, "#");
+		st.nextToken();
+		String timeInt = st.nextToken();
+		String cnt = st.nextToken();
+
+		period = Double.parseDouble(timeInt);
+		count = Integer.parseInt(cnt);
+
+		int num = 0;
+
+		do {
+			new CreateNewMessage().execute();
+			try {
+				Thread.sleep((long) (period * 1000 * 60));
+			} catch (InterruptedException e) {
+				
+				e.printStackTrace();
+			}
+
+			num++;
+		} while (num < count);
+
+		stopSelf();
+
+		return super.onStartCommand(intent, flags, startId);
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		isRunning = false;
+		Toast.makeText(getBaseContext(), "Stop the service", Toast.LENGTH_LONG)
+				.show();
+	}
+
 	class CreateNewMessage extends AsyncTask<String, String, String> {
+
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			// Progress dialog
-			pDialog = new ProgressDialog(RequestOption.this);
-			pDialog.setMessage("Sending location..");
-			pDialog.setIndeterminate(false);
-			pDialog.setCancelable(true);
-			pDialog.show();
+
 		}
 
 		@Override
-		protected String doInBackground(String... arg0) {
+		protected String doInBackground(String... params) {
+			// TODO Auto-generated method stub
 
-			String lat = Double.toString(gps.getLatitude());
-			String lon = Double.toString(gps.getLongitude());
+			Double lat = gps.getLatitude();
+			Double lon = gps.getLongitude();
 
+			String lati = String.valueOf(lat);
+			String longi = String.valueOf(lon);
 			String addr = "";
 
 			Geocoder geocoder = new Geocoder(getBaseContext());
 			try {
-				List<Address> address = geocoder.getFromLocation(
-						Double.parseDouble(lat), Double.parseDouble(lon), 1);
+				List<Address> address = geocoder.getFromLocation(lat, lon, 1);
 
 				if (address != null && address.size() > 0) {
 
@@ -143,34 +125,35 @@ public class RequestOption extends Activity {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
 			// get the System date and time
 			Calendar cl = Calendar.getInstance();
 			SimpleDateFormat dateformat = new SimpleDateFormat(
 					"yyyy-MM-dd HH:mm:ss");
 			String date = dateformat.format(cl.getTime());
 
-			String message = "@locationfinder#Lat-" + lat + "#Lon-" + lon + "#"
-					+ date + "#" + addr + "#";
-			
-			sendSMS(Number, message);
+			// Should get sender mobile number
+
+			String message = "@locationfinder#Lat-" + lati + "#Lon-" + longi
+					+ "#" + date + "#" + addr + "#";
+
+			if (Number.length() > 0) {
+				Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
+				//sendSMS(Number, message);
+			} else {
+				Toast.makeText(getBaseContext(), "Error with the phone number",
+						Toast.LENGTH_SHORT).show();
+			}
 
 			return null;
 		}
 
 		protected void onPostExecute(String file_url) {
-			// dismiss the dialog once done
 
-			pDialog.dismiss();
-			Intent intent = new Intent(Intent.ACTION_MAIN);
-			intent.addCategory(Intent.CATEGORY_HOME);
-			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			startActivity(intent); // Close the application
-			finish();
-			
 		}
 
 	}
-	
+
 	private void sendSMS(String phoneNo, String msg) {
 		String SENT = "SMS_SENT";
 		String DELIVERED = "SMS_DELIVERED";

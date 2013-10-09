@@ -7,6 +7,8 @@ import com.example.showlocation.RequestLocation.CreateRequest;
 import com.google.android.gms.internal.co;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -32,6 +34,7 @@ import android.widget.TextView;
 public class MovingmodeOption extends Activity {
 	
 	private ProgressDialog pDialog;
+	private GPSTracker gps;
 	
 	CheckBox movMod;
 	EditText senderET;
@@ -48,6 +51,8 @@ public class MovingmodeOption extends Activity {
 
 		setContentView(R.layout.moving_layout);
 
+		gps=new GPSTracker(this);
+		
 		movMod = (CheckBox) findViewById(R.id.movingModeChk);
 		senderET = (EditText) findViewById(R.id.ETreceiver);
 		btnsearch = (Button) findViewById(R.id.BtnSearch);
@@ -62,6 +67,14 @@ public class MovingmodeOption extends Activity {
 		movMod.setChecked(isChecked);
 		if (isChecked) {
 			showOptions();
+			
+			if(isServiceRunning("SendinMoveMode"))
+			{
+				btnsend.setEnabled(false);
+			}
+			else{
+				btnAbort.setEnabled(false);
+			}
 		}
 		else{
 			hideOptions();
@@ -113,7 +126,29 @@ public class MovingmodeOption extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				
-				new CreateMoveRequest().execute();
+				if(gps.cangetLocation())
+				{					
+					//new CreateMoveRequest().execute();
+					Intent i=new Intent(MovingmodeOption.this,SendinMoveMode.class);
+					i.putExtra("Msg", "#LFMovingModeON#0.5#15");
+					i.putExtra("phoneNumber",senderET.getText().toString());
+					
+					startService(i);
+				}
+				else{
+					gps.showSettingsAlert();
+				}
+				
+				
+			}
+		});
+		
+		btnAbort.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				stopService(new Intent(MovingmodeOption.this, SendinMoveMode.class));
+				
 			}
 		});
 
@@ -151,7 +186,18 @@ public class MovingmodeOption extends Activity {
 		String value= sharedPreferences.getString(key, "");
 		return value;
 	}
-
+	
+	private Boolean isServiceRunning(String serviceName) {
+		
+		 ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+		    for (RunningServiceInfo runningServiceInfo : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+		        if (serviceName.equals(runningServiceInfo.service.getClassName())) {
+		        	return true;
+		        }
+		    }
+		    return false;
+	}
+	
 	public void hideOptions() {
 		senderET.setEnabled(false);
 		btnsearch.setEnabled(false);
@@ -209,7 +255,7 @@ public class MovingmodeOption extends Activity {
 			super.onPreExecute();
 			// Progress dialog
 			pDialog = new ProgressDialog(MovingmodeOption.this);
-			pDialog.setMessage("Sending location..");
+			pDialog.setMessage("Sending Moving mode request..");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -219,8 +265,10 @@ public class MovingmodeOption extends Activity {
 		protected String doInBackground(String... arg0) {
 
 			String phoneNo = senderET.getText().toString();
-			String message = "#locationfinder#Where are you ?";
-
+			String timeInt=intervalSpin.getSelectedItem().toString();
+			String count=countlocSpin.getSelectedItem().toString();
+			String message = "#LFMovingModeRequest#"+timeInt+"#"+count+"#";
+			
 			if (phoneNo.length() > 0) {
 				sendSMS(phoneNo, message);
 			} else {
@@ -229,6 +277,12 @@ public class MovingmodeOption extends Activity {
 			}
 
 			return null;
+		}
+		
+		protected void onPostExecute(String file_url) {
+			// dismiss the dialog once done
+
+			pDialog.dismiss();
 		}
 
 	}

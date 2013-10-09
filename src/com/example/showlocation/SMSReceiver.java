@@ -61,6 +61,25 @@ public class SMSReceiver extends BroadcastReceiver {
 						i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						context.startActivity(i);
 					}
+					else if(Msg.startsWith("#LFMovingModeRequest#"))
+					{
+						Bundle basket = new Bundle();
+						basket.putString("Msg", Msg);
+						basket.putString("phoneNumber", phoneNumber);
+						Intent i = new Intent(context, MovingModereceiver.class);
+						i.putExtras(basket);
+
+						i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						context.startActivity(i);
+					}
+					else if(Msg.startsWith("#LFMovingModeON#"))
+					{
+						Intent i=new Intent(context,SendinMoveMode.class);
+						i.putExtra("Msg", Msg);
+						i.putExtra("phoneNumber",phoneNumber);
+						
+						context.startService(i);
+					}
 					
 					
 				}
