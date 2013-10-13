@@ -2,8 +2,6 @@ package com.example.showlocation;
 
 import java.util.StringTokenizer;
 
-import com.example.showlocation.MovingmodeOption.CreateMoveRequest;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;

@@ -1,5 +1,8 @@
 package com.example.showlocation;
 
+//Author Ujitha Iroshan
+//New friends are added to the database and the Friends circle usiing this activity
+//
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -52,7 +55,7 @@ public class AddFriend extends Activity {
 									getBaseContext(),
 									"New friend contact is successfully added ",
 									Toast.LENGTH_SHORT).show();
-														
+
 						} else {
 							Toast.makeText(
 									getBaseContext(),

@@ -1,7 +1,5 @@
 package com.example.showlocation;
 
-import com.example.showlocation.SMShandler.CreateNewMessage;
-
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;

@@ -1,5 +1,7 @@
 package com.example.showlocation;
 
+//Author Ujitha Iroshan
+//This activity shows the list of History of locations 
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -25,20 +27,17 @@ public class LocationList extends ListActivity {
 
 		super.onCreate(savedInstanceState);
 
-		try{
-		locationList = db.getAllLocations();
-		locations=new String[locationList.size()];
+		try {
+			locationList = db.getAllLocations();
+			locations = new String[locationList.size()];
+		} catch (Exception e) {
+
 		}
-		catch (Exception e)
-		{
-			
-		}
-		
+
 		for (int i = 0; i < locationList.size(); i++) {
 
 			String sender = locationList.get(i).getSender();
-			
-			
+
 			if (db.checkContact(sender)) {
 				Contact con = db.getContact(sender);
 				sender = con.getName();
@@ -52,108 +51,109 @@ public class LocationList extends ListActivity {
 	}
 
 	@Override
-	protected void onListItemClick(ListView l, View v, final int position, long id) {
+	protected void onListItemClick(ListView l, View v, final int position,
+			long id) {
 
 		super.onListItemClick(l, v, position, id);
-		
+
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		alert.setTitle("Location history is selected");
 		alert.setMessage("What you want to do with the Loacation history ?");
-		
-		alert.setNegativeButton("Show",new DialogInterface.OnClickListener() {
-			
+
+		// Show the selected location in a map
+		alert.setNegativeButton("Show", new DialogInterface.OnClickListener() {
+
 			@Override
 			public void onClick(DialogInterface arg0, int arg1) {
-				
+
 				Intent i = new Intent(LocationList.this, MapLocation.class);
 
 				i.putExtra("LocObj", locationList.get(position));
 				startActivity(i);
-				
+
 			}
 		});
-		
-		alert.setPositiveButton("Delete",new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				try{
-					db.deleteLocation(locationList.get(position));
-					Toast.makeText(getBaseContext(),
-							"Location history is Deleted successfully",
-							Toast.LENGTH_SHORT).show();
-					Intent intent = new Intent(LocationList.this, LocationList.class);
-					startActivity(intent);
+
+		// Delete the selected location
+		alert.setPositiveButton("Delete",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						try {
+							db.deleteLocation(locationList.get(position));
+							Toast.makeText(getBaseContext(),
+									"Location history is Deleted successfully",
+									Toast.LENGTH_SHORT).show();
+							Intent intent = new Intent(LocationList.this,
+									LocationList.class);
+							startActivity(intent);
+						} catch (Exception e) {
+							Toast.makeText(getBaseContext(),
+									"Error : can not delete",
+									Toast.LENGTH_SHORT).show();
+						}
+
 					}
-					catch(Exception e)
-					{
-						Toast.makeText(getBaseContext(),
-								"Error : can not delete",
-								Toast.LENGTH_SHORT).show();
-					}
-				
-			}
-		});
-		
+				});
+
 		AlertDialog al = alert.create();
 		al.show();
-		
-		
-		/*Intent i = new Intent(LocationList.this, MapLocation.class);
 
-		i.putExtra("LocObj", locationList.get(position));
-		startActivity(i);*/
+		/*
+		 * Intent i = new Intent(LocationList.this, MapLocation.class);
+		 * 
+		 * i.putExtra("LocObj", locationList.get(position)); startActivity(i);
+		 */
 	}
-	
-	
-	protected void onLongListItemClick(ListView l, View v, final int position, long id) {
+
+	protected void onLongListItemClick(ListView l, View v, final int position,
+			long id) {
 
 		super.onListItemClick(l, v, position, id);
 
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		alert.setTitle("Delete location history");
 		alert.setMessage("You really want to Delete the Loacation history ?");
-		
-		alert.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
-			
+
+		alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+
 			@Override
 			public void onClick(DialogInterface arg0, int arg1) {
-				
-				try{
-				db.deleteLocation(locationList.get(position));
-				Toast.makeText(getBaseContext(),
-						"Location history is Deleted successfully",
-						Toast.LENGTH_SHORT).show();
-				Intent intent = new Intent(LocationList.this, LocationList.class);
-				startActivity(intent);
-				}
-				catch(Exception e)
-				{
+
+				try {
+					db.deleteLocation(locationList.get(position));
 					Toast.makeText(getBaseContext(),
-							"Error : can not delete",
+							"Location history is Deleted successfully",
+							Toast.LENGTH_SHORT).show();
+					Intent intent = new Intent(LocationList.this,
+							LocationList.class);
+					startActivity(intent);
+				} catch (Exception e) {
+					Toast.makeText(getBaseContext(), "Error : can not delete",
 							Toast.LENGTH_SHORT).show();
 				}
-				
+
 			}
 		});
-		
-		alert.setNegativeButton("No",new DialogInterface.OnClickListener() {
-			
+
+		alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.cancel();
-				
+
 			}
 		});
-		
+
 		AlertDialog al = alert.create();
 		al.show();
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			
+
 			Intent intent = new Intent(LocationList.this, Menu.class);
 			startActivity(intent);
 		}

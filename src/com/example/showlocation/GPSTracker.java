@@ -1,4 +1,5 @@
 package com.example.showlocation;
+
 //Author Ujitha Iroshan
 //Recive the current GPS coordinates
 

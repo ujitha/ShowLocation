@@ -2,14 +2,10 @@ package com.example.showlocation;
 
 import java.util.StringTokenizer;
 
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.sax.StartElementListener;
 import android.telephony.SmsMessage;
 import android.widget.Toast;
 
@@ -40,7 +36,7 @@ public class SMSReceiver extends BroadcastReceiver {
 					if (Msg.startsWith("@locationfinder#")) {
 
 						Toast.makeText(context, Msg, Toast.LENGTH_LONG).show();
-
+						abortBroadcast();
 						Bundle basket = new Bundle();
 						basket.putString("Msg", Msg);
 						basket.putString("phoneNumber", phoneNumber);
@@ -79,6 +75,25 @@ public class SMSReceiver extends BroadcastReceiver {
 						i.putExtra("phoneNumber",phoneNumber);
 						
 						context.startService(i);
+					}
+					else if(Msg.startsWith("@locationfinderMovingMode#"))
+					{
+						StringTokenizer st = new StringTokenizer(Msg, "#");
+						st.nextToken();
+						String smLat = st.nextToken();
+						final String latitude = smLat.substring(4);
+						String smlon = st.nextToken();
+						final String longitude = smlon.substring(4);
+						final String date = st.nextToken();
+						
+						LocationObj loc = new LocationObj(phoneNumber, latitude,
+								longitude, date);
+						
+						Intent i = new Intent(context, MapLocation.class);
+
+						i.putExtra("LocObj", loc);
+						i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						context.startActivity(i);
 					}
 					
 					

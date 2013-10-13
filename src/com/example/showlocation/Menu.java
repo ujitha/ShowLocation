@@ -4,7 +4,6 @@ package com.example.showlocation;
 //Menu with the main functionalities of the app
 
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,7 +17,7 @@ public class Menu extends ListActivity {
 
 	// List options strings
 	private String classes[] = { "Show My Location", "Send My Location",
-			"Friends", "Request location", "Moving mode", "History", "My Info" };
+			"Request location", "Moving mode", "Friends", "History", "My Info" };
 	private GPSTracker gps;
 
 	@Override
@@ -115,19 +114,20 @@ public class Menu extends ListActivity {
 			} else {
 				gps.showSettingsAlert();
 			}
-		} else if (position == 2) {
+		} else if (position == 4) {
 			Intent i = new Intent(Menu.this, FriendsSettings.class);
 			startActivity(i);
-		} else if (position == 3) {
+		} else if (position == 2) {
 			Intent i = new Intent(Menu.this, RequestLocation.class);
 			startActivity(i);
-		}else if(position==4)
-		{
-			Intent intent = new Intent(Menu.this,MovingmodeOption.class);
+		} else if (position == 3) {
+			Intent intent = new Intent(Menu.this, MovingmodeOption.class);
 			startActivity(intent);
-		}
-		else if (position == 5) {
+		} else if (position == 5) {
 			Intent intent = new Intent(Menu.this, LocationList.class);
+			startActivity(intent);
+		} else if (position == 6) {
+			Intent intent = new Intent(Menu.this, Myinfo.class);
 			startActivity(intent);
 		}
 
@@ -138,6 +138,7 @@ public class Menu extends ListActivity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 
+			// Dialog box for selecting quit or not
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 			alert.setTitle("Location Finder Quit");
 			alert.setMessage("You really want to Quit ?");
@@ -151,7 +152,7 @@ public class Menu extends ListActivity {
 							intent.addCategory(Intent.CATEGORY_HOME);
 							intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 							startActivity(intent); // Close the application
-							
+
 						}
 					});
 

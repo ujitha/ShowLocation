@@ -1,10 +1,8 @@
 package com.example.showlocation;
-
+//Author Ujitha Iroshan
+//Moving mode funcion is enabled and configure in this activity
 import java.util.ArrayList;
 import java.util.List;
-
-import com.example.showlocation.RequestLocation.CreateRequest;
-import com.google.android.gms.internal.co;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -19,6 +17,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,15 +26,14 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 public class MovingmodeOption extends Activity {
-	
+
 	private ProgressDialog pDialog;
 	private GPSTracker gps;
-	
+
 	CheckBox movMod;
 	EditText senderET;
 	Button btnsearch;
@@ -51,8 +49,6 @@ public class MovingmodeOption extends Activity {
 
 		setContentView(R.layout.moving_layout);
 
-		gps=new GPSTracker(this);
-		
 		movMod = (CheckBox) findViewById(R.id.movingModeChk);
 		senderET = (EditText) findViewById(R.id.ETreceiver);
 		btnsearch = (Button) findViewById(R.id.BtnSearch);
@@ -67,28 +63,31 @@ public class MovingmodeOption extends Activity {
 		movMod.setChecked(isChecked);
 		if (isChecked) {
 			showOptions();
-			
-			if(isServiceRunning("SendinMoveMode"))
-			{
+
+			if (isServiceRunning("SendinMoveMode")) {
 				btnsend.setEnabled(false);
-			}
-			else{
+			} else {
 				btnAbort.setEnabled(false);
 			}
-		}
-		else{
+		} else {
 			hideOptions();
 		}
-		
+
 		try {
 
 			Bundle gotbasket = getIntent().getExtras();
 			String no = gotbasket.getString("number");
+			String timeInt=gotbasket.getString("timeInt");
+			String count=gotbasket.getString("count");
 			senderET.setText(no);
+			intervalSpin.setSelection(getIndex(intervalSpin,timeInt));
+			countlocSpin.setSelection(getIndex(countlocSpin,count));
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		
 		
 		movMod.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
@@ -101,59 +100,76 @@ public class MovingmodeOption extends Activity {
 				if (!isChecked) {
 					hideOptions();
 				} else {
-					
+
 					showOptions();
+					btnAbort.setEnabled(false);
 				}
 			}
 		});
-		
+
 		btnsearch.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				Bundle basket = new Bundle();
 				basket.putString("stat", "moveMode");
+				basket.putString("timeInt", intervalSpin.getSelectedItem().toString());
+				basket.putString("count", countlocSpin.getSelectedItem().toString());
 				Intent intent = new Intent(MovingmodeOption.this,
 						FriendsList.class);
 				intent.putExtras(basket);
 				startActivity(intent);
-				
+
 			}
 		});
-		
+
 		btnsend.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View arg0) {
-				
-				if(gps.cangetLocation())
-				{					
-					//new CreateMoveRequest().execute();
-					Intent i=new Intent(MovingmodeOption.this,SendinMoveMode.class);
-					i.putExtra("Msg", "#LFMovingModeON#0.5#15");
-					i.putExtra("phoneNumber",senderET.getText().toString());
-					
-					startService(i);
-				}
-				else{
+				gps = new GPSTracker(MovingmodeOption.this);
+				if (gps.cangetLocation()) {
+
+					if (!senderET.getText().toString().equals("")) {
+						new CreateMoveRequest().execute();
+
+					} else {
+						Toast.makeText(getBaseContext(),
+								"Please enter phone number", Toast.LENGTH_SHORT)
+								.show();
+						senderET.findFocus();
+					}
+
+				} else {
 					gps.showSettingsAlert();
 				}
-				
-				
+
 			}
 		});
-		
+
 		btnAbort.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View arg0) {
-				stopService(new Intent(MovingmodeOption.this, SendinMoveMode.class));
-				
+				stopService(new Intent(MovingmodeOption.this,
+						SendinMoveMode.class));
+
 			}
 		});
 
 	}
 	
+	private int getIndex(Spinner spinner, String myString)
+	 {
+	  int index = 0;
+
+	  for (int i=0;i<spinner.getCount();i++){
+	   if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(myString)){
+	    index = i;
+	   }
+	  }
+	  return index;
+	 } 
 	
 	public void putBooleanInPreferences(boolean isChecked, String key) {
 		SharedPreferences sharedPreferences = this
@@ -169,35 +185,34 @@ public class MovingmodeOption extends Activity {
 		Boolean isChecked = sharedPreferences.getBoolean(key, false);
 		return isChecked;
 	}
-	
-	public void putStringInPreferences(String value,String key)
-	{
+
+	public void putStringInPreferences(String value, String key) {
 		SharedPreferences sharedPreferences = this
 				.getPreferences(Activity.MODE_PRIVATE);
 		SharedPreferences.Editor editor = sharedPreferences.edit();
 		editor.putString(key, value);
 		editor.commit();
 	}
-	
-	public String getStringFromPreferences(String key)
-	{
+
+	public String getStringFromPreferences(String key) {
 		SharedPreferences sharedPreferences = this
 				.getPreferences(Activity.MODE_PRIVATE);
-		String value= sharedPreferences.getString(key, "");
+		String value = sharedPreferences.getString(key, "");
 		return value;
 	}
-	
+
 	private Boolean isServiceRunning(String serviceName) {
-		
-		 ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-		    for (RunningServiceInfo runningServiceInfo : activityManager.getRunningServices(Integer.MAX_VALUE)) {
-		        if (serviceName.equals(runningServiceInfo.service.getClassName())) {
-		        	return true;
-		        }
-		    }
-		    return false;
+
+		ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+		for (RunningServiceInfo runningServiceInfo : activityManager
+				.getRunningServices(Integer.MAX_VALUE)) {
+			if (serviceName.equals(runningServiceInfo.service.getClassName())) {
+				return true;
+			}
+		}
+		return false;
 	}
-	
+
 	public void hideOptions() {
 		senderET.setEnabled(false);
 		btnsearch.setEnabled(false);
@@ -247,7 +262,7 @@ public class MovingmodeOption extends Activity {
 				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		countlocSpin.setAdapter(dataAdapter2);
 	}
-	
+
 	class CreateMoveRequest extends AsyncTask<String, String, String> {
 
 		@Override
@@ -265,10 +280,11 @@ public class MovingmodeOption extends Activity {
 		protected String doInBackground(String... arg0) {
 
 			String phoneNo = senderET.getText().toString();
-			String timeInt=intervalSpin.getSelectedItem().toString();
-			String count=countlocSpin.getSelectedItem().toString();
-			String message = "#LFMovingModeRequest#"+timeInt+"#"+count+"#";
-			
+			String timeInt = intervalSpin.getSelectedItem().toString();
+			String count = countlocSpin.getSelectedItem().toString();
+			String message = "#LFMovingModeRequest#" + timeInt + "#" + count
+					+ "#";
+
 			if (phoneNo.length() > 0) {
 				sendSMS(phoneNo, message);
 			} else {
@@ -278,7 +294,7 @@ public class MovingmodeOption extends Activity {
 
 			return null;
 		}
-		
+
 		protected void onPostExecute(String file_url) {
 			// dismiss the dialog once done
 
@@ -286,7 +302,7 @@ public class MovingmodeOption extends Activity {
 		}
 
 	}
-	
+
 	private void sendSMS(String phoneNo, String msg) {
 		String SENT = "SMS_SENT";
 		String DELIVERED = "SMS_DELIVERED";
@@ -302,8 +318,9 @@ public class MovingmodeOption extends Activity {
 			public void onReceive(Context arg0, Intent arg1) {
 				switch (getResultCode()) {
 				case Activity.RESULT_OK:
-					Toast.makeText(getBaseContext(), "Moving mode Request sent",
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(getBaseContext(),
+							"Moving mode Request sent", Toast.LENGTH_SHORT)
+							.show();
 					break;
 				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
 					Toast.makeText(getBaseContext(), "Generic failure",
@@ -344,5 +361,16 @@ public class MovingmodeOption extends Activity {
 
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNo, null, msg, sentPI, deliveredPI);
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			Intent i = new Intent(MovingmodeOption.this, Menu.class);
+			startActivity(i);
+		}
+
+		return super.onKeyDown(keyCode, event);
 	}
 }

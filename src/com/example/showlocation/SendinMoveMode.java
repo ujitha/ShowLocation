@@ -4,14 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import com.example.showlocation.SMShandler.CreateNewMessage;
-
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,7 +14,6 @@ import android.content.IntentFilter;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.widget.Toast;
@@ -49,7 +42,7 @@ public class SendinMoveMode extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 
-		isRunning = true;
+		setRunning(true);
 		gps = new GPSTracker(this);
 
 		String Msg = intent.getStringExtra("Msg");
@@ -84,7 +77,7 @@ public class SendinMoveMode extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		isRunning = false;
+		setRunning(false);
 		Toast.makeText(getBaseContext(), "Stop the service", Toast.LENGTH_LONG)
 				.show();
 	}
@@ -134,12 +127,12 @@ public class SendinMoveMode extends Service {
 
 			// Should get sender mobile number
 
-			String message = "@locationfinder#Lat-" + lati + "#Lon-" + longi
+			String message = "@locationfinderMovingMode#Lat-" + lati + "#Lon-" + longi
 					+ "#" + date + "#" + addr + "#";
 
 			if (Number.length() > 0) {
-				Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
-				//sendSMS(Number, message);
+				
+				sendSMS(Number, message);
 			} else {
 				Toast.makeText(getBaseContext(), "Error with the phone number",
 						Toast.LENGTH_SHORT).show();
@@ -211,6 +204,14 @@ public class SendinMoveMode extends Service {
 
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNo, null, msg, sentPI, deliveredPI);
+	}
+
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+	public void setRunning(boolean isRunning) {
+		this.isRunning = isRunning;
 	}
 
 }

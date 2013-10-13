@@ -7,8 +7,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
-import com.example.showlocation.LocationSender.CreateNewLocation;
-
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -65,12 +63,19 @@ public class SMShandler extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				// create the Asyncronic task to send location details in SMS
-				new CreateNewMessage().execute();
-				
+				if (!receiption.getText().toString().equals("")) {
+
+					new CreateNewMessage().execute();
+				}
+				else{
+					Toast.makeText(getBaseContext(), "Please enter phone number",
+							Toast.LENGTH_SHORT).show();
+					receiption.findFocus();
+				}
+
 			}
 		});
-		
-		
+
 		btnSearch.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -84,10 +89,8 @@ public class SMShandler extends Activity {
 			}
 		});
 
-		
-
 	}
-	
+
 	class CreateNewMessage extends AsyncTask<String, String, String> {
 
 		@Override
@@ -104,11 +107,11 @@ public class SMShandler extends Activity {
 		@Override
 		protected String doInBackground(String... params) {
 			// TODO Auto-generated method stub
-			
+
 			String phoneNo = receiption.getText().toString();
 			System.out.println(phoneNo);
-			LocationObj LBObj = (LocationObj) getIntent()
-					.getSerializableExtra("LocObj");
+			LocationObj LBObj = (LocationObj) getIntent().getSerializableExtra(
+					"LocObj");
 			String lat = LBObj.getLatitude();
 			String lon = LBObj.getLongitude();
 			String addr = "";
@@ -120,8 +123,7 @@ public class SMShandler extends Activity {
 
 				if (address != null && address.size() > 0) {
 
-					for (int i = 0; i < address.get(0)
-							.getMaxAddressLineIndex(); i++) {
+					for (int i = 0; i < address.get(0).getMaxAddressLineIndex(); i++) {
 						addr += address.get(0).getAddressLine(i);
 					}
 
@@ -133,8 +135,6 @@ public class SMShandler extends Activity {
 				e.printStackTrace();
 			}
 
-			String myNum = "";
-
 			// get the System date and time
 			Calendar cl = Calendar.getInstance();
 			SimpleDateFormat dateformat = new SimpleDateFormat(
@@ -143,18 +143,16 @@ public class SMShandler extends Activity {
 
 			// Should get sender mobile number
 
-			String message = "@locationfinder#Lat-" + lat + "#Lon-" + lon
-					+ "#" + date + "#" + addr + "#";
+			String message = "@locationfinder#Lat-" + lat + "#Lon-" + lon + "#"
+					+ date + "#" + addr + "#";
 
 			if (phoneNo.length() > 0) {
 				sendSMS(phoneNo, message);
 			} else {
-				Toast.makeText(getBaseContext(),
-						"Please enter phone number", Toast.LENGTH_SHORT)
-						.show();
+				Toast.makeText(getBaseContext(), "Please enter phone number",
+						Toast.LENGTH_SHORT).show();
 			}
-		
-			
+
 			return null;
 		}
 
@@ -165,7 +163,6 @@ public class SMShandler extends Activity {
 		}
 
 	}
-
 
 	private void sendSMS(String phoneNo, String msg) {
 		String SENT = "SMS_SENT";
@@ -226,18 +223,15 @@ public class SMShandler extends Activity {
 		sms.sendTextMessage(phoneNo, null, msg, sentPI, deliveredPI);
 	}
 
-
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		
-		if (keyCode == KeyEvent.KEYCODE_BACK) 
-		{
-			Intent i=new Intent(SMShandler.this,Menu.class);
+
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			Intent i = new Intent(SMShandler.this, Menu.class);
 			startActivity(i);
 		}
-		
+
 		return super.onKeyDown(keyCode, event);
-	}	
-	
+	}
 
 }

@@ -1,5 +1,7 @@
 package com.example.showlocation;
 
+//Author Ujitha Iroshan
+
 public class Contact {
 
 	private int id;

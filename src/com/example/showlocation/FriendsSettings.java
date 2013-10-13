@@ -1,5 +1,7 @@
 package com.example.showlocation;
 
+//Author Ujitha Iroshan
+//Friend settings activity which has all the functionalities about Friends circle
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -53,11 +55,11 @@ public class FriendsSettings extends ListActivity {
 
 		}
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			
+
 			Intent intent = new Intent(FriendsSettings.this, Menu.class);
 			startActivity(intent);
 		}

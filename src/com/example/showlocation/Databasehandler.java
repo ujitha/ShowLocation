@@ -1,4 +1,6 @@
 package com.example.showlocation;
+//Author Ujitha Iroshan
+//This handles the all Database CRUDE operations in Friend and Location tables
 
 import java.util.ArrayList;
 import java.util.List;

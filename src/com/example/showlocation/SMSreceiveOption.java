@@ -18,7 +18,6 @@ public class SMSreceiveOption extends Activity {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash);
-
 		db = new Databasehandler(this);
 
 		Bundle gotBasket = getIntent().getExtras();

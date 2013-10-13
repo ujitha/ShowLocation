@@ -1,5 +1,7 @@
 package com.example.showlocation;
 
+//Author Ujitha Iroshan
+//This activity List the exisiting Friends details in the friend table 
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -27,7 +29,7 @@ public class FriendsList extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-
+		// Get all the Friend contact details
 		contactList = db.getAllContacts();
 		friends = new String[contactList.size()];
 
@@ -38,12 +40,13 @@ public class FriendsList extends ListActivity {
 					+ contactList.get(i).getPhoneNumber();
 		}
 
+		// Create the FriendList List view
 		setListAdapter(new ArrayAdapter<String>(FriendsList.this,
 				R.layout.list_item, friends));
 		try {
 			Bundle gotbasket = getIntent().getExtras();
 			status = gotbasket.getString("stat");
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -55,7 +58,8 @@ public class FriendsList extends ListActivity {
 			long id) {
 
 		super.onListItemClick(l, v, position, id);
-
+		// If FriendList activity is started from clicking Delete friend menu
+		// item from FriendSettings activity
 		if (status.equals((String) "Delete")) {
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 			alert.setTitle("Delete friend contact");
@@ -68,7 +72,8 @@ public class FriendsList extends ListActivity {
 						public void onClick(DialogInterface dialog, int which) {
 							String chkNum = contactList.get(position)
 									.getPhoneNumber();
-
+							// Delete the selected friend contact from database
+							// friend table
 							db.deleteContact(contactList.get(position));
 
 							if (!db.checkContact(chkNum)) {
@@ -106,6 +111,10 @@ public class FriendsList extends ListActivity {
 			al.show();
 		}
 
+		// If FriendList activity is started from clicking Edit Friend menu item
+		// in Friend Settings activity
+		// Clicking a Friend will start EditFriend acticity and able to Edit the
+		// Friend detail
 		else if (status.equals((String) "Edit")) {
 			Bundle basket = new Bundle();
 			basket.putString("number", contactList.get(position)
@@ -114,7 +123,10 @@ public class FriendsList extends ListActivity {
 			intent.putExtras(basket);
 			startActivity(intent);
 
-		} else if (status.equals((String) "show")) {
+		}
+		// If FriendList is started from clicking Search button in SMShandler
+		// activity
+		else if (status.equals((String) "show")) {
 			String phoneNum = contactList.get(position).getPhoneNumber();
 
 			String latitude = Double.toString(gps.getLatitude());
@@ -130,9 +142,10 @@ public class FriendsList extends ListActivity {
 			intent.putExtras(basket);
 			intent.putExtra("LocObj", LB);
 			startActivity(intent);
-		} 
-		else if(status.equals((String)"request"))
-		{
+		}
+		// If friendList is started from clicking Search button in Request
+		// Location activity
+		else if (status.equals((String) "request")) {
 			String phoneNum = contactList.get(position).getPhoneNumber();
 			Bundle basket = new Bundle();
 			basket.putString("number", phoneNum);
@@ -140,21 +153,30 @@ public class FriendsList extends ListActivity {
 			intent.putExtras(basket);
 			startActivity(intent);
 		}
-		else if(status.equals((String)"moveMode"))
-		{
+		// If friendList is started from clicking Search button in
+		// MovingModeOption activity
+		else if (status.equals((String) "moveMode")) {
+			Bundle gotbasket = getIntent().getExtras();
+
 			String phoneNum = contactList.get(position).getPhoneNumber();
 			Bundle basket = new Bundle();
 			basket.putString("number", phoneNum);
+			try {
+				basket.putString("timeInt", gotbasket.getString("timeInt"));
+				basket.putString("count", gotbasket.getString("count"));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			Intent intent = new Intent(FriendsList.this, MovingmodeOption.class);
 			intent.putExtras(basket);
 			startActivity(intent);
-		}
-		else if (status.equals((String) "search")) {
+		} else if (status.equals((String) "search")) {
 
 		}
 
 	}
 
+	// Back key operation to start FriendSettings activity
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
